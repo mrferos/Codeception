@@ -1,7 +1,6 @@
 language: php
 
 php:
-  - 5.5
   - 5.6
   - 7.0
   - hhvm
@@ -10,10 +9,6 @@ matrix:
   allow_failures:
     - php: hhvm
   include:
-    - php: 5.4 # lowest PHP & Symfony
-      env: SYMFONY=2.7.0
-    - php: 5.5 # lowest symfony version with Guzzle 6
-      env: SYMFONY=2.7.0
     - php: 5.6 # Symfony 2.8
       env: SYMFONY=2.8.0
 
@@ -53,7 +48,6 @@ install:
   - '[[ -z "$SYMFONY" ]] || composer require symfony/dom-crawler=~$SYMFONY --no-update --ignore-platform-reqs'
   - '[[ -z "$SYMFONY" ]] || composer require symfony/browser-kit=~$SYMFONY --no-update --ignore-platform-reqs'
   - '[[ -z "$SYMFONY" ]] || composer update'
-  - 'if [ "$TRAVIS_PHP_VERSION" = "5.4" ]; then composer require guzzlehttp/guzzle=~5.0 --no-update ; fi' # install old guzzle
   - composer install --prefer-dist
   # Yii2
   - composer create-project yiisoft/yii2-app-basic frameworks-yii-basic
@@ -66,8 +60,8 @@ install:
   - git clone -q  -b codeception-2.1 https://github.com/Codeception/sample-l4-app.git frameworks-laravel
   - composer install -d frameworks-laravel --no-dev  --prefer-dist
   # Laravel 5
-  - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || git clone -q -b codeception-2.1 https://github.com/janhenkgerritsen/codeception-laravel5-sample.git frameworks-l5'
-  - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || composer install -d frameworks-l5 --no-dev  --prefer-dist'
+  - git clone -q -b codeception-2.1 https://github.com/janhenkgerritsen/codeception-laravel5-sample.git frameworks-l5'
+  - composer install -d frameworks-l5 --no-dev  --prefer-dist'
   # Symfony
   - git clone -q -b 2.1 https://github.com/Codeception/symfony-demo.git frameworks-symfony
   - composer install -d frameworks-symfony --no-dev --prefer-dist
@@ -78,8 +72,8 @@ install:
   - git clone -q -b 2.1 --recursive https://github.com/Naktibalda/codeception-zf2-tests frameworks-zf2
   - composer install -d frameworks-zf2 --no-dev  --prefer-dist
   # Zend Expressive
-  - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || git clone -q -b master --recursive https://github.com/Naktibalda/codeception-zend-expressive-tests frameworks-zend-expressive'
-  - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || composer install -d frameworks-zend-expressive --no-dev  --prefer-dist'
+  - git clone -q -b master --recursive https://github.com/Naktibalda/codeception-zend-expressive-tests frameworks-zend-expressive'
+  - composer install -d frameworks-zend-expressive --no-dev  --prefer-dist'
 
 before_script:
   - '[[ "$TRAVIS_PHP_VERSION" == "hhvm" ]] || [[ "$TRAVIS_PHP_VERSION" == "7.0" ]] || echo "extension = mongo.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini'
@@ -108,9 +102,6 @@ before_script:
   # Laravel 4
   - touch frameworks-laravel/app/database/database.sqlite
   - php frameworks-laravel/artisan migrate --seed -n --force
-  # Laravel 5
-  - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || touch frameworks-l5/storage/testing.sqlite'
-  - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || php frameworks-l5/artisan migrate --database=sqlite_testing --force'
   # Symfony
   - '[[ -z "$SYMFONY" ]] || php frameworks-symfony/app/console doctrine:schema:create -n --env test'
   - '[[ -z "$SYMFONY" ]] || php frameworks-symfony/app/console doctrine:fixtures:load -n --env test'
@@ -119,10 +110,9 @@ before_script:
   - '[[ "$TRAVIS_PHP_VERSION" == "hhvm" ]] || [[ "$TRAVIS_PHP_VERSION" == "7.0" ]] || php codecept build -c frameworks-phalcon'
   - php codecept build -c frameworks-laravel
   - '[[ -z "$SYMFONY" ]] || php codecept build -c frameworks-symfony/src/AppBundle'
-  - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || php codecept build -c frameworks-l5'
   - php codecept build -c frameworks-zf1
   - php codecept build -c frameworks-zf2
-  - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || php codecept build -c frameworks-zend-expressive'
+  - php codecept build -c frameworks-zend-expressive'
 
 script:
   # enable xdebug before running codeception tests on hhvm
@@ -133,9 +123,9 @@ script:
   - '[[ "$TRAVIS_PHP_VERSION" != "hhvm" ]] || echo "xdebug.enable = Off" >> /etc/hhvm/php.ini'
   - php codecept run functional -c frameworks-yii-basic/tests # Yii2 tests
   - php codecept run -c frameworks-laravel functional,api,unit # Laravel4 Tests
-  - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || php codecept run -c frameworks-l5' # Laravel5 Tests
+  - php codecept run -c frameworks-l5' # Laravel5 Tests
   - '[[ "$TRAVIS_PHP_VERSION" == "hhvm" ]] || [[ "$TRAVIS_PHP_VERSION" == "7.0" ]] || php codecept run functional -c frameworks-phalcon' # Phalcon Tests
   - '[[ -z "$SYMFONY" ]] || php codecept run functional -c frameworks-symfony/src/AppBundle '# Symfony Tests
   - php codecept run functional -c frameworks-zf1 # ZF1 Tests
   - php codecept run functional -c frameworks-zf2 # ZF2 Tests
-  - '[[ "$TRAVIS_PHP_VERSION" == "5.4" ]] || php codecept run functional -c frameworks-zend-expressive' # Zend Expressive Tests
+  - php codecept run functional -c frameworks-zend-expressive' # Zend Expressive Tests
